@@ -5,7 +5,6 @@
 
 { lib, stdenv
 , fetchFromGitHub
-, fetchpatch
 , qtbase
 , qtmultimedia
 , qscintilla
@@ -79,7 +78,7 @@ mkDerivation rec {
   inherit doCheck;
 
   cmakeFlags = [
-    "-DVERSION=${version}"
+    "-DOPENSCAD_VERSION=${version}"
     "-DEXPERIMENTAL=1"
     "-DENABLE_PYTHON=OFF"
   ] ++ lib.optionals (!spacenavSupport) [
