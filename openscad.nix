@@ -16,6 +16,7 @@
 , glew
 , opencsg
 , cgal_5
+, glm
 , mpfr
 , gmp
 , glib
@@ -46,25 +47,34 @@
 
 let
   pyenv = python3.withPackages(pkgs: [ pkgs.pip pkgs.setuptools pkgs.numpy pkgs.pillow ]);
+
   openscad-src = fetchFromGitHub {
     owner = "openscad";
     repo = "openscad";
-    rev = "87bf17e53aac352c5f45dbdb05a4e05376512acb";
-    hash = "sha256-OtxvhllPfyiu90/B4/O3EYgogdhcaKpj+NPsBHZF5pM=";
+    rev = "158c5b94fbe09020bcaf8b61a513640de616c5d6";
+    hash = "sha256-zLEnBA3XCEIJ2SEzMI4ZhUS5TWtY5I08V6HeheDijxo=";
+    fetchSubmodules = true;
+  };
+
+  thrust-src = fetchFromGitHub {
+    owner = "NVIDIA";
+    repo = "thrust";
+    rev = "756c5afc0750f1413da05bd2b6505180e84c53d4";
+    hash = "sha256-mUhMXGPbO2t83EvI8YNDRLngvLiwfzs4EgRrcxKfhHs=";
     fetchSubmodules = true;
   };
 in
 
 mkDerivation rec {
   pname = "openscad";
-  version = "2023.07.31";
+  version = "2024.01.14";
 
   src = openscad-src;
   nativeBuildInputs = [ bison flex pkg-config gettext cmake python3 ] ++ lib.optionals doCheck [ pyenv xvfb-run ];
 
   buildInputs = [
     eigen boost glew opencsg cgal_5 mpfr gmp glib
-    harfbuzz lib3mf libzip double-conversion freetype fontconfig
+    glm harfbuzz lib3mf libzip double-conversion freetype fontconfig
     qtbase qtmultimedia qscintilla cairo mimalloc
     xorg.libXdmcp
     xorg.libSM
@@ -81,6 +91,7 @@ mkDerivation rec {
     "-DOPENSCAD_VERSION=${version}"
     "-DEXPERIMENTAL=1"
     "-DENABLE_PYTHON=OFF"
+    "-Dthrust_SOURCE_DIR=${thrust-src}"
   ] ++ lib.optionals (!spacenavSupport) [
     "-DENABLE_SPNAV=OFF"
   ] ++ lib.optionals (!doCheck) [
